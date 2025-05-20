@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 import { z } from "zod";
 import { BookingDetails } from "../types/type";
 import { viewBookingSchema } from "../types/validationBooking";
-import axios from "axios";
+import apiClient, { isAxiosError } from "../services/apiService";
 
 export default function CheckBooking() {
   const [formData, setFormData] = useState({
@@ -42,22 +42,14 @@ export default function CheckBooking() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(
-        "http://weworkbe.test/api/check-booking",
-        {
-          ...formData,
-        },
-        {
-          headers: {
-            "X-API-KEY": "71c067f7-3012-46f4-bf0a-20fb717a1a51",
-          },
-        }
-      );
+      const response = await apiClient.post("/check-booking", {
+        ...formData,
+      });
 
       console.log("We are checking your booking:", response.data.data);
       setBookingDetails(response.data.data);
     } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         console.error("Error submitting form:", error.message);
         setError(error.message);
       } else {
